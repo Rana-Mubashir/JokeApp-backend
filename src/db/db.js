@@ -5,7 +5,7 @@ config();
 
 async function connectDb() {
     try {
-        const db = await mongoose.connect(`${process.env.MONGODB_URL}/jokeApp`)
+        const db = await mongoose.connect(`${process.env.MONGODB_URL}/backendStart`)
         if (db) {
             console.log("database connected successfully");
         }

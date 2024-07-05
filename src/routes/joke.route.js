@@ -3,8 +3,9 @@ import { createJoke,updateJoke,delJoke,getAllJokes } from "../controllers/joke.c
 const jokeRouter=Router()
 
 jokeRouter.post("/create",createJoke)
-jokeRouter.post("/update:id",updateJoke)
-jokeRouter.delete("/delete:id",delJoke)
-jokeRouter.get("/getAll/:userId",getAllJokes)
+jokeRouter.put("/update/:jokeId/:createdBy",updateJoke)
+jokeRouter.delete("/delete/:jokeId/:createdBy",delJoke)
+jokeRouter.get("/getAll/:createdBy",getAllJokes)
+
 
 export default jokeRouter

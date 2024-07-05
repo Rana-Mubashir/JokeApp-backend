@@ -4,16 +4,16 @@ import { Joke } from '../models/jokes.model.js'
 
 async function createJoke(req, res) {
     try {
-        const { title, joke } = req.body
+        const { title, joke, createdBy } = req.body
         if (!title || !joke) {
             res.status(400).json({
                 message: "Empty fields"
             })
         }
-
         const createJoke = await Joke.create({
             title,
-            joke
+            joke,
+            createdBy
         })
         if (createJoke) {
             res.status(200).json({
@@ -37,13 +37,13 @@ async function createJoke(req, res) {
 
 async function getAllJokes(req, res) {
     try {
-        const userId = req.params.userId
-        if (!userId) {
+        const createdBy = req.params.createdBy
+        if (!createdBy) {
             return res.status(404).json({
-                message: "User id must be provided"
+                message: "createdby id must be provided"
             })
         }
-        const AllJokes = Joke.find({ createdBy: userId })
+        const AllJokes = await Joke.find({ createdBy: createdBy })
         if (!AllJokes) {
             return res.status(404).json({
                 message: "No jokes from this user"
@@ -63,36 +63,32 @@ async function getAllJokes(req, res) {
     }
 }
 
-async function updateJoke() {
+async function updateJoke(req, res) {
     try {
-        const id = req.params.id;
+        const createdBy = req.params.createdBy
+        const jokeId = req.params.jokeId
         const { title, joke } = req.body
-        if (!id) {
-            return res.status(400).json({
-                message: "Id must be provided"
+        if (!createdBy || !jokeId) {
+            req.status(404).json({
+                message: 'ids must be provided'
             })
         }
         if (!title || !joke) {
-            return res.status(400).json({
-                message: "Empty fields"
+            req.status(404).json({
+                message: 'content must be provided'
             })
         }
-        const jokeToUpdate = await Joke.findById(id)
-        if (!jokeToUpdate) {
-            return res.status(404).json({
-                message: "Joke does not exists"
-            })
-        }
-
-        jokeToUpdate.title = title
-        jokeToUpdate.joke = joke
-
-        const saveChanges = await jokeToUpdate.save();
-        if (saveChanges) {
-            return res.status(200).json({
-                message: "Joke updated sucessfully"
-            })
-        }
+        const findJoke = await Joke.findOneAndUpdate({
+            $or: [
+                {
+                    createdBy: createdBy,
+                    _id: jokeId
+                }
+            ]
+        }, {
+            title: title,
+            joke: joke
+        }, { new: true })
     } catch (error) {
         res.status(400).json({
             message: "Not ok",
@@ -103,20 +99,27 @@ async function updateJoke() {
 
 async function delJoke(req, res) {
     try {
-        const id = req.params.id
-        if (!id) {
+        const createdBy = req.params.createdBy
+        const jokeId = req.params.jokeId
+        if (!createdBy || !jokeId) {
             return res.status(404).json({
-                message: "Id must be provided"
+                message: "both ids must be provided"
             })
         }
-        const deletedJoke = await Joke.findByIdAndDelete(id)
-        if (!deletedJoke) {
+        const findJoke = await Joke.findOneAndDelete({
+            $or: [
+                { createdBy: createdBy },
+                { _id: jokeId }
+            ]
+        });
+        if (!findJoke) {
             return res.status(400).json({
-                message: "Joke does not exists"
+                message: "Joke not found"
             })
         }
         return res.status(200).json({
-            message: "Joke is deleted successfully"
+            message: "deleted",
+            data: findJoke
         })
     } catch (error) {
         res.status(400).json({
@@ -125,5 +128,6 @@ async function delJoke(req, res) {
         })
     }
 }
+
 
 export { createJoke, updateJoke, delJoke, getAllJokes }
