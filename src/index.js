@@ -8,10 +8,13 @@ dotenv.config({
 
 connectDb()
 .then(()=>{
-    app.listen(8000,()=>{
-        console.log("server listening at port 4000")
+    app.listen(9000,()=>{
+        console.log("server listening at port 8000")
     })
 })
 .catch(()=>{
     console.log("Server is not listening")
+})
+app.use('/rana',()=>{
+   console.log("hello")
 })

@@ -1,4 +1,4 @@
-import express, { json } from 'express'
+import express from 'express'
 import cors from 'cors'
 import  userRouter  from './routes/user.route.js';
 import jokeRouter from './routes/joke.route.js';

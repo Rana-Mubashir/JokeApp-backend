@@ -1,5 +1,4 @@
-import express from 'express'
-import mongoose from 'mongoose'
+
 import { Joke } from '../models/jokes.model.js'
 
 async function createJoke(req, res) {
@@ -89,6 +88,7 @@ async function updateJoke(req, res) {
             title: title,
             joke: joke
         }, { new: true })
+        
     } catch (error) {
         res.status(400).json({
             message: "Not ok",
